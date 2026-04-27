@@ -5,6 +5,16 @@ links you are allowed to access. It combines Spotify metadata workflows through
 spotDL, direct public media file downloads, and yt-dlp-supported public video
 pages in one clean dashboard.
 
+## Screenshots
+
+<div align="center">
+
+| Dashboard | Queue | Library | About |
+|:---:|:---:|:---:|:---:|
+| <img src="screenshots/dashboard.png" width="380" alt="Dashboard"> | <img src="screenshots/queue.png" width="380" alt="Queue"> | <img src="screenshots/library.png" width="380" alt="Library"> | <img src="screenshots/about.png" width="380" alt="About"> |
+
+</div>
+
 ## Highlights
 
 - Spotify track, album, playlist, and artist links through spotDL metadata and
