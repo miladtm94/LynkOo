@@ -125,8 +125,8 @@ make check          # run test, build, and npm audit
 
 ## Support
 
-If LynkOo helps you, you can support maintenance through
-[Buy Me a Coffee](https://buymeacoffee.com/miladtm94).
+☕ If LynkOo helps you, you can support maintenance, packaging, and future updates
+through [Buy Me a Coffee](https://buymeacoffee.com/miladtm94). 💛
 
 ## Testing
 

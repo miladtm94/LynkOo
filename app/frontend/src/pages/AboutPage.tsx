@@ -1,5 +1,4 @@
 import { CapabilityMatrix } from "../components/CapabilityMatrix";
-import { EXTERNAL_LINKS } from "../lib/links";
 import type { ProviderCapability } from "../lib/types";
 
 type AboutPageProps = {
@@ -31,17 +30,17 @@ export function AboutPage({ providers }: AboutPageProps) {
       </div>
       <div className="glass-panel rounded-[1.5rem] p-6">
         <p className="text-xs uppercase text-tide">Support</p>
-        <h3 className="mt-2 text-2xl font-semibold">Help keep LynkOo moving.</h3>
+        <h3 className="mt-2 text-2xl font-semibold">Help keep LynkOo moving ☕</h3>
         <p className="mt-3 max-w-2xl text-ink/70">
-          Donations support maintenance, packaging, and extractor updates.
+          Donations support maintenance, packaging, and extractor updates. 💛
         </p>
         <a
           className="mt-5 inline-flex rounded-full bg-ink px-5 py-3 text-sm font-semibold text-paper transition hover:bg-ink/85"
-          href={EXTERNAL_LINKS.buyMeACoffee}
+          href="https://buymeacoffee.com/miladtm94"
           rel="noreferrer"
           target="_blank"
         >
-          Buy me a coffee
+          ☕ Buy me a coffee
         </a>
       </div>
       <CapabilityMatrix providers={providers} />
