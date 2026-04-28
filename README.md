@@ -123,25 +123,7 @@ make build          # build frontend
 make check          # run test, build, and npm audit
 ```
 
-## Support
 
-☕ If LynkOo helps you, you can support maintenance, packaging, and future updates
-through [Buy Me a Coffee](https://buymeacoffee.com/miladtm94). 💛
-
-## Testing
-
-Backend tests:
-
-```bash
-uv run pytest tests/app_backend
-```
-
-Frontend build:
-
-```bash
-cd app/frontend
-npm run build
-```
 
 ## Troubleshooting
 
@@ -162,3 +144,8 @@ LynkOo is released under the MIT License. See [LICENSE](LICENSE).
 
 LynkOo is derived from and preserves substantial functionality from
 [spotDL](https://github.com/spotDL/spotify-downloader).
+
+
+## Support
+
+If LynkOo has helped you in any way, you can support the project through [Buy Me a Coffee](https://buymeacoffee.com/miladtm94). ☕ 💛
