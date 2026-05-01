@@ -1,8 +1,11 @@
 import pytest
+from fastapi.testclient import TestClient
 from pydantic import ValidationError
 
 from app.backend.api import routes_settings
+from app.backend.main import create_app
 from app.backend.models.settings import AppSettings
+from app.backend.services.download_manager import DownloadManager
 
 
 def test_settings_normalize_output_directory():
@@ -13,6 +16,30 @@ def test_settings_normalize_output_directory():
 def test_settings_reject_unsupported_audio_format():
     with pytest.raises(ValidationError):
         AppSettings(default_audio_format="exe")
+
+
+def test_update_settings_creates_selected_output_directory(tmp_path):
+    selected = tmp_path / "selected" / "downloads"
+    manager = DownloadManager(settings=AppSettings(output_directory=tmp_path), providers=[])
+    client = TestClient(create_app(manager=manager))
+
+    response = client.put("/api/settings", json={"output_directory": str(selected)})
+
+    assert response.status_code == 200
+    assert selected.is_dir()
+    assert response.json()["settings"]["output_directory"] == str(selected)
+
+
+def test_update_settings_rejects_output_file_path(tmp_path):
+    selected = tmp_path / "not-a-folder"
+    selected.write_text("nope")
+    manager = DownloadManager(settings=AppSettings(output_directory=tmp_path), providers=[])
+    client = TestClient(create_app(manager=manager))
+
+    response = client.put("/api/settings", json={"output_directory": str(selected)})
+
+    assert response.status_code == 400
+    assert "not a folder" in response.json()["detail"]
 
 
 def test_macos_folder_picker_uses_osascript(monkeypatch):

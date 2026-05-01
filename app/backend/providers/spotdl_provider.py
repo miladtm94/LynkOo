@@ -23,7 +23,7 @@ from app.backend.models.download_result import (
 )
 from app.backend.models.settings import SUPPORTED_AUDIO_FORMATS, AppSettings
 from app.backend.providers.base import DownloadProvider, ProgressCallback, ProviderError
-from app.backend.utils.filenames import sanitize_filename
+from app.backend.services.file_manager import FileManager
 from app.backend.utils.validation import is_spotify_url
 
 SPOTDL_BITRATES = {
@@ -58,6 +58,7 @@ class SpotDLProvider(DownloadProvider):
 
     def __init__(self, settings: AppSettings):
         self.settings = settings
+        self.file_manager = FileManager(settings)
 
     @property
     def capability(self) -> ProviderCapability:
@@ -143,17 +144,10 @@ class SpotDLProvider(DownloadProvider):
         return spotify_settings, downloader_settings
 
     def _resolve_output_directory(self, job: DownloadJob) -> Path:
-        output_directory = job.options.output_directory
-        base = output_directory.expanduser() if output_directory else self.settings.output_directory
-        if output_directory and not base.is_absolute():
-            base = self.settings.output_directory / base
-
-        for part in Path(job.options.output_subfolder or "").parts:
-            if part in {"", ".", ".."}:
-                continue
-            base = base / sanitize_filename(part)
-
-        return base.expanduser()
+        return self.file_manager.output_directory(
+            job.options.output_directory,
+            job.options.output_subfolder,
+        )
 
     def _get_metadata_from_url(self, url: str) -> MediaMetadata:
         """Infer enough metadata for the UI without making a second Spotify API call."""

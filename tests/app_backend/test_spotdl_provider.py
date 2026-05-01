@@ -61,6 +61,20 @@ def test_spotdl_relative_output_override_stays_under_library(tmp_path):
     )
 
 
+def test_spotdl_absolute_output_override_is_created(tmp_path):
+    selected = tmp_path / "selected" / "music"
+    provider = SpotDLProvider(AppSettings(output_directory=tmp_path / "library"))
+    job = DownloadJob(
+        url="https://open.spotify.com/playlist/37i9dQZF1E35jo0CrB6zS5",
+        options=DownloadOptions(output_directory=selected),
+    )
+
+    _, downloader_settings = provider._spotdl_settings(job)
+
+    assert downloader_settings["output"].startswith(str(selected))
+    assert selected.is_dir()
+
+
 def test_spotdl_provider_maps_spotify_rate_limit(tmp_path):
     provider = SpotDLProvider(AppSettings(output_directory=tmp_path))
 

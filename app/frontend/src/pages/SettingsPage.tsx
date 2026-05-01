@@ -12,6 +12,7 @@ export function SettingsPage({ settings, onSettingsChange }: SettingsPageProps) 
   const [draft, setDraft] = useState<AppSettings | undefined>(settings);
   const [dependencies, setDependencies] = useState<DependencyStatus[]>([]);
   const [message, setMessage] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
 
   useEffect(() => {
     setDraft(settings);
@@ -30,18 +31,44 @@ export function SettingsPage({ settings, onSettingsChange }: SettingsPageProps) 
     if (!draft) {
       return;
     }
-    const response = await updateSettings(draft);
-    setDraft(response.settings);
-    setDependencies(response.dependencies);
-    onSettingsChange(response.settings);
-    setMessage("Settings saved.");
+    setBusy(true);
+    setMessage(null);
+    try {
+      const response = await updateSettings(draft);
+      setDraft(response.settings);
+      setDependencies(response.dependencies);
+      onSettingsChange(response.settings);
+      setMessage("Settings saved.");
+    } catch (exc) {
+      setMessage(exc instanceof Error ? exc.message : "Could not save settings.");
+    } finally {
+      setBusy(false);
+    }
   }
 
   async function handleChooseFolder() {
-    const response = await selectOutputDirectory();
-    setMessage(response.message);
-    if (response.selected && response.path && draft) {
-      setDraft({ ...draft, output_directory: response.path });
+    if (!draft) {
+      return;
+    }
+    setBusy(true);
+    setMessage(null);
+    try {
+      const response = await selectOutputDirectory();
+      if (!response.selected || !response.path) {
+        setMessage(response.message);
+        return;
+      }
+
+      const nextDraft = { ...draft, output_directory: response.path };
+      const saved = await updateSettings(nextDraft);
+      setDraft(saved.settings);
+      setDependencies(saved.dependencies);
+      onSettingsChange(saved.settings);
+      setMessage(`${response.message} Settings saved.`);
+    } catch (exc) {
+      setMessage(exc instanceof Error ? exc.message : "Could not choose output folder.");
+    } finally {
+      setBusy(false);
     }
   }
 
@@ -64,7 +91,8 @@ export function SettingsPage({ settings, onSettingsChange }: SettingsPageProps) 
                 value={draft.output_directory}
               />
               <button
-                className="rounded-[1.1rem] border border-ink/15 px-5 py-3 text-sm font-semibold text-ink transition hover:bg-ink/5"
+                className="rounded-[1.1rem] border border-ink/15 px-5 py-3 text-sm font-semibold text-ink transition hover:bg-ink/5 disabled:cursor-not-allowed disabled:opacity-55"
+                disabled={busy}
                 onClick={handleChooseFolder}
                 type="button"
               >
@@ -129,8 +157,12 @@ export function SettingsPage({ settings, onSettingsChange }: SettingsPageProps) 
             </select>
           </label>
         </div>
-        <button className="mt-7 rounded-full bg-ink px-6 py-3 text-paper" type="submit">
-          Save settings
+        <button
+          className="mt-7 rounded-full bg-ink px-6 py-3 text-paper disabled:cursor-not-allowed disabled:opacity-55"
+          disabled={busy}
+          type="submit"
+        >
+          {busy ? "Saving..." : "Save settings"}
         </button>
         {message ? <p className="mt-4 text-sm text-moss">{message}</p> : null}
       </form>

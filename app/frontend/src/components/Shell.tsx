@@ -4,6 +4,7 @@ const NAV_ITEMS = [
   { id: "download", label: "Dashboard" },
   { id: "queue", label: "Queue" },
   { id: "library", label: "Library" },
+  { id: "settings", label: "Settings" },
   { id: "about", label: "About" },
 ] as const;
 

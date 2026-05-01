@@ -8,7 +8,7 @@ import sys
 from pathlib import Path
 from typing import Optional
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
 from app.backend.api.deps import get_download_manager
@@ -37,6 +37,7 @@ def update_settings(
     settings: AppSettings,
     manager: DownloadManager = Depends(get_download_manager),
 ) -> SettingsResponse:
+    _ensure_output_directory(settings.output_directory)
     manager.update_settings(settings)
     return SettingsResponse(settings=manager.settings, dependencies=dependency_statuses())
 
@@ -138,3 +139,20 @@ def _select_output_directory_macos() -> FolderSelectionResponse:
         path=Path(selected).expanduser(),
         message="Output folder selected.",
     )
+
+
+def _ensure_output_directory(path: Path) -> None:
+    output_directory = path.expanduser()
+    if output_directory.exists() and not output_directory.is_dir():
+        raise HTTPException(
+            status_code=400,
+            detail=f"Output path is not a folder: {output_directory}",
+        )
+
+    try:
+        output_directory.mkdir(parents=True, exist_ok=True)
+    except OSError as exc:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Could not create output folder {output_directory}: {exc}",
+        ) from exc
