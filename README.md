@@ -28,6 +28,8 @@ pages in one clean dashboard.
 - Queue, progress updates, completed Library view, and “Open folder” action.
 - Optional playlist/download subfolders inside a main library folder.
 - Docker development setup with backend reload and Vite hot module reload.
+- Standalone macOS desktop app (`LynkOo.app`) — no terminal, Docker, or dev
+  server required.
 
 ## Boundaries
 
@@ -110,6 +112,36 @@ Open:
 http://127.0.0.1:5173
 ```
 
+## Desktop App
+
+LynkOo can be packaged into a standalone macOS app that bundles the backend,
+frontend, and Python runtime into one double-clickable `LynkOo.app` — no
+terminal, virtualenv, or Docker needed to run it afterward.
+
+```bash
+make desktop-build
+```
+
+This builds the frontend and packages everything into `dist/LynkOo.app`.
+Launch it from Finder, or:
+
+```bash
+open dist/LynkOo.app
+```
+
+Drag it into `/Applications` to keep it around. It still relies on FFmpeg on
+`PATH` at runtime, same as the dev setup.
+
+To iterate without repackaging, run it directly:
+
+```bash
+make desktop
+```
+
+Rebuild with `make desktop-build` any time backend or frontend source
+changes — the packaged app is a frozen snapshot and won't pick up changes on
+its own.
+
 ## Useful Commands
 
 ```bash
@@ -121,6 +153,8 @@ make docker-down    # stop Docker services
 make test           # run backend app tests
 make build          # build frontend
 make check          # run test, build, and npm audit
+make desktop        # run the desktop app (backend + native window), unpackaged
+make desktop-build  # build frontend and package dist/LynkOo.app
 ```
 
 

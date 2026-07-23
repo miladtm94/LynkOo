@@ -6,7 +6,7 @@ BACKEND_PORT ?= 8800
 FRONTEND_DIR := app/frontend
 COMMIT_MSG ?= Update LynkOo local media manager
 
-.PHONY: help setup backend stop-backend frontend docker-up docker-down docker-logs test build audit check lock status pull push git-update clean
+.PHONY: help setup backend stop-backend frontend docker-up docker-down docker-logs test build audit check lock status pull push git-update clean desktop desktop-build
 
 help:
 	@echo "LynkOo shortcuts"
@@ -21,6 +21,7 @@ help:
 	@echo "  make docker-up    Run backend + frontend in Docker with hot reload"
 	@echo "  make docker-down  Stop Docker dev services"
 	@echo "  make docker-logs  Follow Docker dev logs"
+	@echo "  make desktop      Run the desktop app (backend + native window) without packaging"
 	@echo ""
 	@echo "Verify:"
 	@echo "  make test         Run backend app tests"
@@ -28,6 +29,9 @@ help:
 	@echo "  make audit        Run npm audit"
 	@echo "  make check        Run test + build + audit"
 	@echo "  make lock         Refresh uv.lock"
+	@echo ""
+	@echo "Desktop app:"
+	@echo "  make desktop-build  Build frontend + package standalone dist/LynkOo.app"
 	@echo ""
 	@echo "Git:"
 	@echo "  make status       Show git status"
@@ -41,7 +45,7 @@ help:
 setup:
 	@command -v brew >/dev/null && brew install python@3.13 python-tk@3.13 || echo "Warning: Homebrew not found, skipping Python/tkinter installation"
 	@test -x "$(PYTHON)" || /opt/homebrew/bin/python3.13 -m venv .venv || python3 -m venv .venv
-	$(PIP) install -e . pytest pytest-asyncio "httpx>=0.24,<0.25" uv
+	$(PIP) install -e . pytest pytest-asyncio "httpx>=0.24,<0.25" uv pyinstaller
 	cd $(FRONTEND_DIR) && npm install
 
 backend: stop-backend
@@ -84,6 +88,13 @@ stop-backend:
 
 frontend:
 	cd $(FRONTEND_DIR) && npm run dev
+
+desktop: build
+	$(PYTHON) -m app.desktop
+
+desktop-build: build
+	$(PYTHON) -m PyInstaller desktop.spec --noconfirm
+	@echo "Built dist/LynkOo.app -- drag it into /Applications, or run: open dist/LynkOo.app"
 
 docker-up:
 	docker compose up --build
